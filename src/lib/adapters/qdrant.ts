@@ -124,7 +124,7 @@ export class QdrantAdapter implements DBAdapter {
         let scrolled = 0
         while (scrolled < offset) {
           const pageSize = Math.min(limit, offset - scrolled)
-          const r = await this.req<ScrollResp>(`/collections/${collection}/points/scroll`, {
+          const r: ScrollResp = await this.req<ScrollResp>(`/collections/${collection}/points/scroll`, {
             method: 'POST',
             body: JSON.stringify({
               limit: pageSize, with_payload: false, with_vector: false,

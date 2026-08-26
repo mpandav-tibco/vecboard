@@ -212,7 +212,7 @@ export function IngestPage() {
           <div>
             <label className="block text-xs text-gray-500 mb-1">Strategy</label>
             <select className="input text-sm" value={chunkConfig.strategy}
-              onChange={(e) => setChunkConfig((c) => ({ ...c, strategy: e.target.value as ChunkConfig['strategy'] }))}>
+              onChange={(e) => setChunkConfig({ ...chunkConfig, strategy: e.target.value as ChunkConfig['strategy'] })}>
               <option value="paragraph">Paragraph</option>
               <option value="sentence">Sentence</option>
               <option value="fixed">Fixed size</option>
@@ -223,12 +223,12 @@ export function IngestPage() {
             <div>
               <label className="block text-xs text-gray-500 mb-1">Size</label>
               <input type="number" className="input text-sm text-center" value={chunkConfig.size}
-                onChange={(e) => setChunkConfig((c) => ({ ...c, size: Number(e.target.value) }))} min={64} max={4096} />
+                onChange={(e) => setChunkConfig({ ...chunkConfig, size: Number(e.target.value) })} min={64} max={4096} />
             </div>
             <div>
               <label className="block text-xs text-gray-500 mb-1">Overlap</label>
               <input type="number" className="input text-sm text-center" value={chunkConfig.overlap}
-                onChange={(e) => setChunkConfig((c) => ({ ...c, overlap: Number(e.target.value) }))} min={0} max={512} />
+                onChange={(e) => setChunkConfig({ ...chunkConfig, overlap: Number(e.target.value) })} min={0} max={512} />
             </div>
           </div>
         </div>

@@ -77,7 +77,7 @@ describe('nearVectorSearch', () => {
     mockFetch.mockResolvedValue(gqlRes('Docs', []))
     await nearVectorSearch({
       className: 'Docs', vector: [], limit: 5, properties: ['content'], config: null,
-      filter: { path: 'source', operator: 'Equal', valueType: 'valueText', value: 'wiki' },
+      filters: [{ path: 'source', operator: 'Equal', valueType: 'valueText', value: 'wiki' }],
     })
     const q = lastQuery()
     expect(q).toContain('where')

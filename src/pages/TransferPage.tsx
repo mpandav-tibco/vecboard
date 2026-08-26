@@ -104,7 +104,10 @@ export function TransferPage() {
   }, [])
 
   const setMapping = (name: string, patch: Partial<PropMapping>) =>
-    setPropMappings((m) => ({ ...m, [name]: { action: 'transfer', ...m[name], ...patch } }))
+    setPropMappings((m) => {
+      const existing: PropMapping = m[name] ?? { action: 'transfer' }
+      return { ...m, [name]: { ...existing, ...patch } }
+    })
 
   const handleTransfer = async () => {
     if (!sourceCollection || !targetCollection || !config) return

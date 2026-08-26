@@ -16,8 +16,10 @@ services:
     container_name: weaviate-dev
     restart: unless-stopped
     ports:
-      - "8080:8080"
-      - "50051:50051"
+      # Host ports remapped to avoid clashing with a separately-run Weaviate.
+      # The UI reaches Weaviate over the internal network on 8080/50051.
+      - "18085:8080"
+      - "50052:50051"
     volumes:
       - weaviate_data:/var/lib/weaviate
     environment:
