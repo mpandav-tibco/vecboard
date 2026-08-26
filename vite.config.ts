@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/api/weaviate': {
-          target: env.WEAVIATE_URL || 'http://localhost:8080',
+          target: env.WEAVIATE_URL || 'http://localhost:18080',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/weaviate/, ''),
         },
