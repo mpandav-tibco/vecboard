@@ -475,7 +475,7 @@ export function CollectionDetailPage() {
               </p>
             )}
             {!objLoading && filteredObjects.length > 0 && (
-              <table className="w-full text-sm">
+              <table className="w-full table-fixed text-sm">
                 <thead>
                   <tr className="border-b border-border">
                     <th className="px-3 py-3 w-8">
@@ -492,16 +492,19 @@ export function CollectionDetailPage() {
                         }
                       </button>
                     </th>
-                    <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">ID</th>
+                    <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium w-44">ID</th>
                     <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium">Properties</th>
-                    <th className="px-4 py-3 text-xs text-gray-500 font-medium text-right">Actions</th>
+                    <th className="px-4 py-3 text-xs text-gray-500 font-medium text-right w-20">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredObjects.map((obj) => {
                     const isSelected = selectedIds.has(obj.id)
                     return (
-                      <tr key={obj.id} className={cn('hover:bg-surface-200 group', isSelected && 'bg-accent/5')}>
+                      <tr
+                        key={obj.id}
+                        className={cn('group hover:bg-surface-200', isSelected && 'bg-accent/5')}
+                      >
                         <td className="px-3 py-2">
                           <button
                             onClick={() => toggleOne(obj.id)}
@@ -518,8 +521,8 @@ export function CollectionDetailPage() {
                         <td className="px-4 py-2 text-gray-300 text-xs">
                           {truncate(JSON.stringify(obj.properties), 80)}
                         </td>
-                        <td className="px-4 py-2 text-right">
-                          <div className="flex justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <td className="px-4 py-2 text-right w-20">
+                          <div className="flex justify-end gap-1 transition-opacity opacity-0 group-hover:opacity-100">
                             <button onClick={() => setSelectedObj(obj as any)} title="View full object details" className="btn-ghost p-1">
                               <Eye className="w-3.5 h-3.5" />
                             </button>

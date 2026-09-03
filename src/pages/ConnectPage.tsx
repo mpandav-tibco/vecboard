@@ -17,11 +17,12 @@ const DB_LABELS: Record<string, string> = {
 }
 
 const DB_COLORS: Record<string, string> = {
-  weaviate: 'bg-green-900/40 text-green-400',
-  qdrant:   'bg-red-900/40 text-red-400',
-  chroma:   'bg-orange-900/40 text-orange-400',
-  pinecone: 'bg-blue-900/40 text-blue-400',
-  pgvector: 'bg-sky-900/40 text-sky-400',
+  weaviate:     'bg-green-900/40 text-green-400',
+  qdrant:       'bg-red-900/40 text-red-400',
+  chroma:       'bg-orange-900/40 text-orange-400',
+  pinecone:     'bg-blue-900/40 text-blue-400',
+  pgvector:     'bg-sky-900/40 text-sky-400',
+  activespaces: 'bg-purple-900/40 text-purple-400',
 }
 
 interface DBOption {
@@ -38,14 +39,15 @@ const DB_OPTIONS: DBOption[] = [
   { type: 'chroma',   label: 'Chroma',   description: 'AI-native embedding store', defaultPort: 8000, available: true },
   { type: 'pinecone', label: 'Pinecone', description: 'Managed vector database', defaultPort: 443, available: true },
   { type: 'pgvector', label: 'pgvector', description: 'PostgreSQL + PostgREST', defaultPort: 3000, available: true },
-  { type: 'activespaces', label: 'ActiveSpaces', description: 'TIBCO in-memory data grid', defaultPort: 9000, available: false },
+  { type: 'activespaces', label: 'ActiveSpaces', description: 'TIBCO in-memory data grid (5.x)', defaultPort: 8080, available: true },
 ]
 
 const DEFAULT_PROXY: Partial<Record<VectorDBType, string>> = {
-  weaviate: '/api/weaviate',
-  qdrant:   '/api/qdrant',
-  chroma:   '/api/chroma',
-  pgvector: '/api/pgvector',
+  weaviate:     '/api/weaviate',
+  qdrant:       '/api/qdrant',
+  chroma:       '/api/chroma',
+  pgvector:     '/api/pgvector',
+  activespaces: '/api/activespaces',
 }
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
@@ -65,9 +67,11 @@ function enrichError(raw: string, dbType: VectorDBType, dbLabel: string): Enrich
   if (r.includes('timed out'))
     return {
       message: `${dbLabel} didn't respond within 8 s.`,
-      hint: dbType !== 'pinecone'
-        ? `Start it locally: docker compose${dbType !== 'weaviate' ? ` --profile ${dbType}` : ''} up -d`
-        : 'Check the index host URL in your Pinecone console.',
+      hint: dbType === 'pinecone'
+        ? 'Check the index host URL in your Pinecone console.'
+        : dbType === 'activespaces'
+        ? 'Start the AS REST bridge: cd bridge && start.bat  —  then verify the FTL realm server is running.'
+        : `Start it locally: docker compose${dbType !== 'weaviate' ? ` --profile ${dbType}` : ''} up -d`,
     }
 
   if (r.includes('non-json') || r.includes('unexpected token') || r.includes('<!doctype') || r.includes('html'))
@@ -126,6 +130,7 @@ export function ConnectPage() {
   const selectedDB = DB_OPTIONS.find((d) => d.type === form.dbType) ?? DB_OPTIONS[0]
   const isPinecone = form.dbType === 'pinecone'
   const isPgvector = form.dbType === 'pgvector'
+  const isActiveSpaces = form.dbType === 'activespaces'
 
   const handleDBSelect = (opt: DBOption) => {
     if (!opt.available) return
@@ -276,7 +281,7 @@ export function ConnectPage() {
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2">
                   <label className="block text-xs font-medium text-gray-400 mb-1">
-                    {isPinecone ? 'Index Host' : 'Host'}
+                    {isPinecone ? 'Index Host' : isActiveSpaces ? 'FTL Realm Host' : 'Host'}
                   </label>
                   <input
                     className="input"
@@ -288,6 +293,11 @@ export function ConnectPage() {
                   {isPinecone && (
                     <p className="mt-1 text-xs text-gray-600">
                       Find the index host in your <span className="text-gray-400">Pinecone console → Indexes → your index → Host</span>
+                    </p>
+                  )}
+                  {isActiveSpaces && (
+                    <p className="mt-1 text-xs text-gray-600">
+                      FTL realm server host · default port <span className="text-gray-400">8080</span>
                     </p>
                   )}
                 </div>
@@ -326,14 +336,19 @@ export function ConnectPage() {
 
               <div>
                 <label className="block text-xs font-medium text-gray-400 mb-1">
-                  API Key {isPinecone ? <span className="text-red-400">*</span> : <span className="text-gray-600">(optional)</span>}
+                  {isActiveSpaces ? 'Grid Name' : 'API Key'}{' '}
+                  {isPinecone ? <span className="text-red-400">*</span> : <span className="text-gray-600">(optional)</span>}
                 </label>
                 <input
                   className="input font-mono"
-                  type="password"
+                  type={isActiveSpaces ? 'text' : 'password'}
                   value={form.apiKey}
                   onChange={(e) => setForm((f) => ({ ...f, apiKey: e.target.value }))}
-                  placeholder={isPinecone ? 'Pinecone API key' : 'Leave blank for anonymous access'}
+                  placeholder={
+                    isPinecone ? 'Pinecone API key'
+                    : isActiveSpaces ? 'Leave blank for _default grid'
+                    : 'Leave blank for anonymous access'
+                  }
                   required={isPinecone}
                 />
               </div>
@@ -397,6 +412,8 @@ export function ConnectPage() {
                   ? <>Create a free index at <span className="text-gray-400">app.pinecone.io</span></>
                   : isPgvector
                   ? <>Requires <span className="text-gray-400">PostgREST</span> in front of Postgres · <code className="font-mono text-gray-500">postgrest postgrest.conf</code></>
+                  : isActiveSpaces
+                  ? <>Requires the <span className="text-gray-400">AS REST bridge</span> running · <code className="font-mono text-gray-500">cd bridge &amp;&amp; start.bat</code></>
                   : <>Start locally: <code className="font-mono text-gray-400">docker compose{form.dbType !== 'weaviate' ? ` --profile ${form.dbType}` : ''} up -d</code></>
                 }
               </p>

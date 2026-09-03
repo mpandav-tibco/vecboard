@@ -8,7 +8,7 @@ export function useHealth() {
   const setStatus = useConnectionStore((s) => s.setStatus)
 
   const query = useQuery({
-    queryKey: ['health', config?.host, config?.dbType],
+    queryKey: ['health', config?.host, config?.port, config?.scheme, config?.dbType],
     queryFn: () => getAdapter(config!).checkHealth(),
     enabled: !!config,
     refetchInterval: 15_000,

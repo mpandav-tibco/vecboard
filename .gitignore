@@ -4,3 +4,10 @@ dist/
 .env.local
 *.local
 .claude/
+
+# Fat JAR build artifacts
+bridge/build/
+bridge/lib/*.jar
+bridge/*.class
+bridge/bridge.log
+release/

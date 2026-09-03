@@ -124,6 +124,24 @@ services:
     networks:
       - vector-net
 
+  # ── ActiveSpaces REST bridge — optional: docker compose --profile activespaces up ─
+  # Bridges between the browser UI and the native AS Java client library.
+  # Requires the AS installation to be available in the image — see bridge/Dockerfile.
+  # The bridge forwards requests to the FTL realm server specified by the UI.
+  as-bridge:
+    profiles: [activespaces]
+    build:
+      context: ./bridge
+      dockerfile: Dockerfile
+    container_name: as-bridge
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    environment:
+      AS_HOME: /opt/tibco/as/5.2
+    networks:
+      - vector-net
+
 networks:
   vector-net:
     driver: bridge

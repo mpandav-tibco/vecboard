@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 export function useObjects(className: string, limit = 25, offset = 0) {
   const config = useConnectionStore((s) => s.config)
   return useQuery({
-    queryKey: ['objects', className, limit, offset, config?.host, config?.dbType],
+    queryKey: ['objects', className, limit, offset, config?.host, config?.port, config?.dbType],
     queryFn: () => getAdapter(config!).listObjects(className, limit, offset),
     enabled: !!config && !!className,
     placeholderData: keepPreviousData,

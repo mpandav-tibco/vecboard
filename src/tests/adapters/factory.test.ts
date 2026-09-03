@@ -8,6 +8,7 @@ import { QdrantAdapter } from '@/lib/adapters/qdrant'
 import { ChromaAdapter } from '@/lib/adapters/chroma'
 import { PineconeAdapter } from '@/lib/adapters/pinecone'
 import { PgvectorAdapter } from '@/lib/adapters/pgvector'
+import { ActiveSpacesAdapter } from '@/lib/adapters/activespaces'
 import type { ConnectionConfig } from '@/types/domain'
 
 function cfg(dbType: ConnectionConfig['dbType']): ConnectionConfig {
@@ -35,8 +36,12 @@ describe('getAdapter', () => {
     expect(getAdapter(cfg('pgvector'))).toBeInstanceOf(PgvectorAdapter)
   })
 
-  it('throws for unsupported dbType "activespaces"', () => {
-    expect(() => getAdapter(cfg('activespaces'))).toThrow(/activespaces.*not yet supported/i)
+  it('returns ActiveSpacesAdapter for dbType "activespaces"', () => {
+    expect(getAdapter(cfg('activespaces'))).toBeInstanceOf(ActiveSpacesAdapter)
+  })
+
+  it('throws for an unsupported dbType', () => {
+    expect(() => getAdapter(cfg('mystery' as ConnectionConfig['dbType']))).toThrow(/not yet supported/i)
   })
 
   it('each call returns a fresh adapter instance', () => {

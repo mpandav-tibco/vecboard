@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 export function useCollections() {
   const config = useConnectionStore((s) => s.config)
   return useQuery({
-    queryKey: ['collections', config?.host, config?.dbType],
+    queryKey: ['collections', config?.host, config?.port, config?.dbType],
     queryFn: () => getAdapter(config!).listCollections(),
     enabled: !!config,
     staleTime: 30_000,
@@ -18,7 +18,7 @@ export function useCollections() {
 export function useCollection(name: string) {
   const config = useConnectionStore((s) => s.config)
   return useQuery({
-    queryKey: ['collection', name, config?.host, config?.dbType],
+    queryKey: ['collection', name, config?.host, config?.port, config?.dbType],
     queryFn: () => getAdapter(config!).getCollection(name),
     enabled: !!config && !!name,
   })
@@ -27,7 +27,7 @@ export function useCollection(name: string) {
 export function useObjectCount(className: string) {
   const config = useConnectionStore((s) => s.config)
   return useQuery({
-    queryKey: ['objectCount', className, config?.host, config?.dbType],
+    queryKey: ['objectCount', className, config?.host, config?.port, config?.dbType],
     queryFn: () => getAdapter(config!).getObjectCount(className),
     enabled: !!config && !!className,
     staleTime: 10_000,

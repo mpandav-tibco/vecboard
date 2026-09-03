@@ -40,6 +40,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/pgvector/, ''),
         },
+        '/api/activespaces': {
+          target: env.AS_BRIDGE_URL || 'http://localhost:9090',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api\/activespaces/, ''),
+        },
         '/api/ollama': {
           target: env.OLLAMA_URL || 'http://localhost:11434',
           changeOrigin: true,
